@@ -14,6 +14,10 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
     }
     @Override
     public void agregar(T elemento) {
+        if(elemento == null){
+            throw new IllegalArgumentException("El elemento no puede ser nulo");
+        }
+
         Nodo<T> nuevoNodo = new Nodo<>(elemento);
 
         if(estaVacia()){
