@@ -1,4 +1,9 @@
 package uniquindio.edu.co.estructuras;
 
-public class Coleccion {
+public interface Coleccion<T> extends Iterable<T> {
+    void agregar(T elemento);
+    boolean eliminar(T elemento);
+    T obtener(int posicion);
+    int tamanio();
+    boolean estaVacia();
 }
