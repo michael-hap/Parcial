@@ -120,4 +120,18 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
             }
         };
     }
+
+    public void mostrarLista(){
+        if(estaVacia()){
+            System.out.println("Lista vacia");
+            return;
+        }
+
+        Iterator<T> iterador = iterator();
+
+        while(iterador.hasNext()){
+            System.out.print(" [ " + iterador.next() + " ]--->");
+        }
+        System.out.println(" null");
+    }
 }
