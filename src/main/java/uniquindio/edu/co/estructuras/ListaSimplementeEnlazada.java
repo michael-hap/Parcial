@@ -65,7 +65,18 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
 
     @Override
     public T obtener(int posicion) {
-        return null;
+        if(posicion<0 || posicion>=tamanio){
+            throw new IndexOutOfBoundsException("Posición no valida");
+        }
+
+        Nodo<T> actual = inicio;
+        int pos= 0;
+        while(pos != posicion){
+            actual = actual.getSiguiente();
+            pos++;
+        }
+        return actual.getDato();
+
     }
 
     @Override
@@ -80,6 +91,29 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new Iterator<T>() {
+
+            private Nodo<T> actual = inicio;
+
+            @Override
+            public boolean hasNext() {
+                return actual != null;
+            }
+
+            @Override
+            public T next() {
+
+                if (!hasNext()) {
+                    throw new java.util.NoSuchElementException(
+                            "No hay más elementos en la lista"
+                    );
+                }
+
+                T dato = actual.getDato();
+                actual = actual.getSiguiente();
+
+                return dato;
+            }
+        };
     }
 }
