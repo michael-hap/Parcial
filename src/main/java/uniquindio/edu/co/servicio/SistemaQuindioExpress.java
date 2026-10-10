@@ -20,6 +20,7 @@ import java.util.TreeSet;
 public class SistemaQuindioExpress {
 
     // Paquetes y repartidores
+    private List<Paquete> paquetesRegistrados;
     private List<Paquete> paquetesPendientes;
     private Map<String, Paquete> paquetesPorCodigo;
     private Map<String, Repartidor> repartidoresPorIdentificacion;
@@ -39,6 +40,7 @@ public class SistemaQuindioExpress {
 
     public SistemaQuindioExpress() {
 
+        paquetesRegistrados = new ArrayList<>();
         paquetesPendientes = new ArrayList<>();
         paquetesPorCodigo = new HashMap<>();
         repartidoresPorIdentificacion = new HashMap<>();
@@ -68,11 +70,13 @@ public class SistemaQuindioExpress {
             return false;
         }
 
-        // Conservar el registro general y el orden de llegada.
+
+        paquetesRegistrados.add(paquete);
+
         paquetesPendientes.add(paquete);
         paquetesPorCodigo.put(paquete.getCodigo(), paquete);
 
-        // Registrar municipios sin duplicados.
+
         municipiosDestino.add(paquete.getDestino());
         municipiosOrdenados.add(paquete.getDestino());
 
@@ -80,10 +84,7 @@ public class SistemaQuindioExpress {
         String municipio = paquete.getDestino();
 
         if (!paquetesPorMunicipio.containsKey(municipio)) {
-            paquetesPorMunicipio.put(
-                    municipio,
-                    new ArrayList<>()
-            );
+            paquetesPorMunicipio.put(municipio, new ArrayList<>());
         }
 
         paquetesPorMunicipio.get(municipio).add(paquete);
@@ -107,8 +108,16 @@ public class SistemaQuindioExpress {
         return !paquetesPendientes.isEmpty();
     }
 
+    public List<Paquete> obtenerPaquetesRegistrados() {
+        return new ArrayList<>(paquetesRegistrados);
+    }
+
     public List<Paquete> obtenerPaquetesPendientes() {
         return new ArrayList<>(paquetesPendientes);
+    }
+
+    public int cantidadPaquetesPorDespachar() {
+        return colaLlegada.size();
     }
 
     // GESTIÓN DE MUNICIPIOS
@@ -158,9 +167,7 @@ public class SistemaQuindioExpress {
         }
 
         repartidoresPorIdentificacion.put(
-                repartidor.getIdentificacion(),
-                repartidor
-        );
+                repartidor.getIdentificacion(), repartidor);
 
         return true;
     }
@@ -185,13 +192,9 @@ public class SistemaQuindioExpress {
 
     // DESPACHO POR ORDEN DE LLEGADA
 
-    public boolean despacharPorLlegada(
-            String identificacionRepartidor) {
+    public boolean despacharPorLlegada(String identificacionRepartidor) {
 
-        Repartidor repartidor =
-                repartidoresPorIdentificacion.get(
-                        identificacionRepartidor
-                );
+        Repartidor repartidor = repartidoresPorIdentificacion.get(identificacionRepartidor);
 
         Paquete paquete = colaLlegada.peek();
 
@@ -227,13 +230,9 @@ public class SistemaQuindioExpress {
 
     // DESPACHO POR PRIORIDAD
 
-    public boolean despacharPorPrioridad(
-            String identificacionRepartidor) {
+    public boolean despacharPorPrioridad(String identificacionRepartidor) {
 
-        Repartidor repartidor =
-                repartidoresPorIdentificacion.get(
-                        identificacionRepartidor
-                );
+        Repartidor repartidor = repartidoresPorIdentificacion.get(identificacionRepartidor);
 
         Paquete paquete = colaPrioridad.peek();
 
@@ -250,7 +249,7 @@ public class SistemaQuindioExpress {
             return false;
         }
 
-        // Registrar la asignación.
+
         paquetesAsignados.put(
                 identificacionRepartidor,
                 paquete
@@ -262,8 +261,6 @@ public class SistemaQuindioExpress {
         colaPrioridad.poll();
         colaLlegada.remove(paquete);
 
-        // Se conserva en el registro de pendientes hasta
-        // que se confirme la entrega.
         return true;
     }
 
@@ -279,31 +276,23 @@ public class SistemaQuindioExpress {
 
     // REGISTRO DE ENTREGA
 
-    public boolean registrarEntrega(
-            String identificacionRepartidor) {
+    public boolean registrarEntrega(String identificacionRepartidor) {
 
         Repartidor repartidor =
-                repartidoresPorIdentificacion.get(
-                        identificacionRepartidor
-                );
+                repartidoresPorIdentificacion.get(identificacionRepartidor);
 
-        Paquete paquete =
-                paquetesAsignados.get(
-                        identificacionRepartidor
-                );
+        Paquete paquete = paquetesAsignados.get(identificacionRepartidor);
 
-        // Debe existir el repartidor y una asignación activa.
+
         if (repartidor == null || paquete == null) {
             return false;
         }
 
-        // Registrar el paquete al final del historial.
+
         historialEntregas.agregar(paquete);
 
-        // El paquete ya fue entregado: deja de estar pendiente.
         paquetesPendientes.remove(paquete);
 
-        // Retirarlo de la agrupación de paquetes pendientes.
         String municipio = paquete.getDestino();
 
         List<Paquete> paquetesDelMunicipio =
@@ -313,10 +302,7 @@ public class SistemaQuindioExpress {
             paquetesDelMunicipio.remove(paquete);
         }
 
-        // Finalizar la asignación.
         paquetesAsignados.remove(identificacionRepartidor);
-
-        // El repartidor vuelve a estar disponible.
         repartidor.setDisponible(true);
 
         return true;
@@ -333,6 +319,20 @@ public class SistemaQuindioExpress {
         }
 
         return historial;
+    }
+
+    public List<Paquete> consultarRegistradosPorMunicipio(String municipio) {
+
+        List<Paquete> resultado = new ArrayList<>();
+
+        for (Paquete paquete : paquetesRegistrados) {
+
+            if (paquete.getDestino().equalsIgnoreCase(municipio)) {
+                resultado.add(paquete);
+            }
+        }
+
+        return resultado;
     }
 }
 

@@ -4,6 +4,8 @@ package uniquindio.edu.co.servicio;
 import uniquindio.edu.co.modelo.Paquete;
 import uniquindio.edu.co.modelo.Repartidor;
 
+import java.util.List;
+
 public class PruebaSistemaQuindioExpress {
 
     public static void main(String[] args) {
@@ -289,6 +291,20 @@ public class PruebaSistemaQuindioExpress {
         System.out.println("Despacho con cola vacía: "
                 + sistemaVacio.despacharPorPrioridad("R500"));
 
-        System.out.println("\n===== FIN DE LAS PRUEBAS =====");
+
+        System.out.println("----- REGISTRADOS POR MUNICIPIO -----");
+
+        List<Paquete> registradosArmenia =
+                sistema.consultarRegistradosPorMunicipio("Armenia");
+
+        for (Paquete paquete : registradosArmenia) {
+            System.out.println(paquete.getCodigo());
+        }
+
+        System.out.println("----- PENDIENTES DE ENTREGA EN ARMENIA -----");
+        for ( Paquete paquete: sistema.obtenerPaquetesPorMunicipio("Armenia")) {
+            System.out.println(paquete.getCodigo());
+        }
     }
+
 }

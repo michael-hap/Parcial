@@ -7,7 +7,6 @@ import java.util.List;
 
 public class AlgoritmosPaquetes {
 
-    // SUMAR RECURSIVAMENTE EL PESO DE LOS PAQUETES DE UN MUNICIPIO
 
     public static double calcularPesoTotalPorMunicipio(
             List<Paquete> paquetes, String municipio) {
@@ -22,28 +21,24 @@ public class AlgoritmosPaquetes {
     private static double calcularPesoRecursivo(
             List<Paquete> paquetes, String municipio, int posicion) {
 
-        // Caso base: se recorrieron todos los paquetes.
+        // Caso base
         if (posicion == paquetes.size()) {
             return 0;
         }
 
         Paquete paqueteActual = paquetes.get(posicion);
 
-        // Caso recursivo: el destino coincide.
+        // Caso recursivo
         if (paqueteActual != null
-                && paqueteActual.getDestino().equals(municipio)) {
+                && paqueteActual.getDestino().equalsIgnoreCase(municipio)) {
 
-            return paqueteActual.getPeso()
-                    + calcularPesoRecursivo(
-                    paquetes, municipio, posicion + 1);
+            return paqueteActual.getPeso() + calcularPesoRecursivo(paquetes, municipio, posicion + 1);
         }
 
-        // Caso recursivo: el destino no coincide.
-        return calcularPesoRecursivo(
-                paquetes, municipio, posicion + 1);
+
+        return calcularPesoRecursivo(paquetes, municipio, posicion + 1);
     }
 
-    // CONTAR RECURSIVAMENTE LOS PAQUETES SEGÚN SU PRIORIDAD
 
     public static int contarPaquetesPorPrioridad(
             List<Paquete> paquetes, int prioridadMinima) {
@@ -56,36 +51,26 @@ public class AlgoritmosPaquetes {
                 paquetes, prioridadMinima, 0, 0);
     }
 
-    private static int contarPrioridadRecursivo(
-            List<Paquete> paquetes,
-            int prioridadMinima,
-            int posicion,
-            int acumulador) {
+    private static int contarPrioridadRecursivo(List<Paquete> paquetes, int prioridadMinima,
+            int posicion, int acumulador) {
 
-        // Caso base: se recorrieron todos los paquetes.
+        // Caso base
         if (posicion == paquetes.size()) {
             return acumulador;
         }
 
         Paquete paqueteActual = paquetes.get(posicion);
-
-        // Contar si la prioridad alcanza el mínimo.
+        //Caso recursivo
         if (paqueteActual != null
                 && paqueteActual.getPrioridad() >= prioridadMinima) {
 
-            return contarPrioridadRecursivo(
-                    paquetes,
-                    prioridadMinima,
-                    posicion + 1,
-                    acumulador + 1);
+            return contarPrioridadRecursivo(paquetes, prioridadMinima,
+                    posicion + 1, acumulador + 1);
         }
 
-        // Continuar sin aumentar el contador.
-        return contarPrioridadRecursivo(
-                paquetes,
-                prioridadMinima,
-                posicion + 1,
-                acumulador);
+
+        return contarPrioridadRecursivo(paquetes, prioridadMinima,
+                posicion + 1, acumulador);
     }
 
     // BÚSQUEDA BINARIA POR CÓDIGO
