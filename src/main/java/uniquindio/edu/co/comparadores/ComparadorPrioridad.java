@@ -1,3 +1,4 @@
+
 package uniquindio.edu.co.comparadores;
 
 import uniquindio.edu.co.modelo.Paquete;
@@ -8,6 +9,7 @@ public class ComparadorPrioridad implements Comparator<Paquete> {
     @Override
     public int compare(Paquete primerPaquete, Paquete segundoPaquete) {
 
+        // Primero: prioridad de mayor a menor.
         int comparacionPrioridad = Integer.compare(
                 segundoPaquete.getPrioridad(),
                 primerPaquete.getPrioridad()
@@ -17,6 +19,7 @@ public class ComparadorPrioridad implements Comparator<Paquete> {
             return comparacionPrioridad;
         }
 
+        // Segundo: tiempo estimado de menor a mayor.
         int comparacionTiempo = Integer.compare(
                 primerPaquete.getTiempoEstimado(),
                 segundoPaquete.getTiempoEstimado()
@@ -26,6 +29,7 @@ public class ComparadorPrioridad implements Comparator<Paquete> {
             return comparacionTiempo;
         }
 
+        // Tercero: código en orden ascendente.
         return primerPaquete.getCodigo().compareTo(
                 segundoPaquete.getCodigo()
         );
