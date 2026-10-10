@@ -1,86 +1,105 @@
+
 package uniquindio.edu.co.estructuras;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
+
     private Nodo<T> inicio;
     private Nodo<T> fin;
     private int tamanio;
 
-    public ListaSimplementeEnlazada(){
-        this.inicio= null;
-        this.fin= null;
-        this.tamanio= 0;
+    public ListaSimplementeEnlazada() {
+        this.inicio = null;
+        this.fin = null;
+        this.tamanio = 0;
     }
+
     @Override
     public void agregar(T elemento) {
-        if(elemento == null){
-            throw new IllegalArgumentException("El elemento no puede ser nulo");
+
+        if (elemento == null) {
+            throw new IllegalArgumentException(
+                    "El elemento no puede ser nulo");
         }
 
         Nodo<T> nuevoNodo = new Nodo<>(elemento);
 
-        if(estaVacia()){
+        if (estaVacia()) {
             inicio = nuevoNodo;
             fin = nuevoNodo;
         } else {
             fin.setSiguiente(nuevoNodo);
             fin = nuevoNodo;
         }
+
         tamanio++;
     }
 
     @Override
     public boolean eliminar(T elemento) {
-        if( estaVacia()){
+
+        if (estaVacia() || elemento == null) {
             return false;
         }
-        if(inicio.getDato().equals(elemento)){
-            inicio=inicio.getSiguiente();
+
+        // Caso 1: eliminar el primer elemento.
+        if (inicio.getDato().equals(elemento)) {
+
+            inicio = inicio.getSiguiente();
             tamanio--;
 
-            if(inicio== null){
+            if (inicio == null) {
                 fin = null;
             }
+
             return true;
         }
-        Nodo<T> actual = inicio.getSiguiente();
-        Nodo<T> anterior = inicio;
 
-        while(actual != null){
-            if(actual.getDato().equals(elemento)){
-                if(actual == fin){
+        // Caso 2: buscar el elemento en el resto de la lista.
+        Nodo<T> anterior = inicio;
+        Nodo<T> actual = inicio.getSiguiente();
+
+        while (actual != null) {
+
+            if (actual.getDato().equals(elemento)) {
+
+                anterior.setSiguiente(actual.getSiguiente());
+
+                // Si se elimina el último nodo, actualizar fin.
+                if (actual == fin) {
                     fin = anterior;
-                    actual=actual.getSiguiente();
-                    anterior.setSiguiente(actual);
-                }else {
-                    actual = actual.getSiguiente();
-                    anterior.setSiguiente(actual);
                 }
 
                 tamanio--;
                 return true;
             }
+
             anterior = actual;
             actual = actual.getSiguiente();
         }
+
         return false;
     }
 
     @Override
     public T obtener(int posicion) {
-        if(posicion<0 || posicion>=tamanio){
-            throw new IndexOutOfBoundsException("Posición no valida");
+
+        if (posicion < 0 || posicion >= tamanio) {
+            throw new IndexOutOfBoundsException(
+                    "Posición no válida");
         }
 
         Nodo<T> actual = inicio;
-        int pos= 0;
-        while(pos != posicion){
+        int pos = 0;
+
+        while (pos != posicion) {
             actual = actual.getSiguiente();
             pos++;
         }
-        return actual.getDato();
 
+        return actual.getDato();
     }
 
     @Override
@@ -95,6 +114,7 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
 
     @Override
     public Iterator<T> iterator() {
+
         return new Iterator<T>() {
 
             private Nodo<T> actual = inicio;
@@ -108,9 +128,8 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
             public T next() {
 
                 if (!hasNext()) {
-                    throw new java.util.NoSuchElementException(
-                            "No hay más elementos en la lista"
-                    );
+                    throw new NoSuchElementException(
+                            "No hay más elementos en la lista");
                 }
 
                 T dato = actual.getDato();
@@ -121,17 +140,19 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
         };
     }
 
-    public void mostrarLista(){
-        if(estaVacia()){
-            System.out.println("Lista vacia");
+    public void mostrarLista() {
+
+        if (estaVacia()) {
+            System.out.println("Lista vacía");
             return;
         }
 
         Iterator<T> iterador = iterator();
 
-        while(iterador.hasNext()){
+        while (iterador.hasNext()) {
             System.out.print(" [ " + iterador.next() + " ]--->");
         }
+
         System.out.println(" null");
     }
 }
