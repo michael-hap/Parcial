@@ -1,3 +1,4 @@
+
 package uniquindio.edu.co.servicio;
 
 import uniquindio.edu.co.modelo.Paquete;
@@ -11,19 +12,32 @@ public class PruebaIntegracionCompleta {
 
         System.out.println("===== PRUEBA DE INTEGRACION =====");
 
-        // 1. Registrar 30 paquetes en 5 municipios
+        // 1. Registrar 30 paquetes con codigos no consecutivos
         System.out.println("\n1. REGISTRO DE PAQUETES");
 
         String[] municipios = {
-                "Armenia", "Salento", "Calarca", "Circasia", "Montenegro"
+                "Armenia",
+                "Salento",
+                "Calarca",
+                "Circasia",
+                "Montenegro"
+        };
+
+        String[] codigos = {
+                "PQ731", "PQ105", "PQ942", "PQ318", "PQ567",
+                "PQ829", "PQ214", "PQ684", "PQ450", "PQ913",
+                "PQ126", "PQ875", "PQ392", "PQ641", "PQ258",
+                "PQ704", "PQ183", "PQ956", "PQ327", "PQ510",
+                "PQ842", "PQ469", "PQ137", "PQ625", "PQ298",
+                "PQ781", "PQ354", "PQ906", "PQ172", "PQ538"
         };
 
         int paquetesRegistrados = 0;
 
-        for (int i = 1; i <= 30; i++) {
+        for (int i = 0; i < codigos.length; i++) {
 
-            String codigo = String.format("PQ%03d", i);
-            String destino = municipios[(i - 1) % municipios.length];
+            String codigo = codigos[i];
+            String destino = municipios[i % municipios.length];
 
             Paquete paquete = new Paquete(
                     codigo,
@@ -50,7 +64,7 @@ public class PruebaIntegracionCompleta {
         System.out.println("\n2. CODIGO DUPLICADO");
 
         Paquete duplicado = new Paquete(
-                "PQ001", "Armenia", 3.0, 3, 25
+                "PQ731", "Armenia", 3.0, 3, 25
         );
 
         System.out.println("Debe ser false: "
@@ -82,10 +96,10 @@ public class PruebaIntegracionCompleta {
 
         System.out.println("Repartidor R001: "
                 + sistema.consultarRepartidor("R001"));
-        System.out.println("Identificación inexistente: "
+        System.out.println("Identificacion inexistente: "
                 + sistema.consultarRepartidor("R999"));
 
-        // 4. Probar una identificación duplicada
+        // 4. Probar una identificacion duplicada
         System.out.println("\n4. IDENTIFICACION DUPLICADA");
 
         Repartidor repetido = new Repartidor(
@@ -114,7 +128,7 @@ public class PruebaIntegracionCompleta {
         System.out.println("Pendientes obtenidos: "
                 + sistema.cantidadPaquetesPendientes());
 
-        // 6. Despachar correctamente según la zona del primer paquete
+        // 6. Despachar correctamente segun la zona del primer paquete
         System.out.println("\n6. DESPACHO CORRECTO");
 
         Paquete primero = sistema.consultarSiguientePorLlegada();
@@ -160,11 +174,11 @@ public class PruebaIntegracionCompleta {
         System.out.println("Entregas en historial obtenidas: "
                 + sistema.consultarHistorialEntregas().size());
 
-        // 9. Consultar paquete por código
+        // 9. Consultar paquetes por codigo
         System.out.println("\n9. CONSULTA POR CODIGO");
 
-        System.out.println("Paquete existente PQ001: "
-                + sistema.consultarPaquete("PQ001"));
+        System.out.println("Paquete existente PQ731: "
+                + sistema.consultarPaquete("PQ731"));
 
         System.out.println("Paquete inexistente PQ999: "
                 + sistema.consultarPaquete("PQ999"));
