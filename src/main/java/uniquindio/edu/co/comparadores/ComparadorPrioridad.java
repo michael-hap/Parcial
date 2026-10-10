@@ -1,4 +1,3 @@
-
 package uniquindio.edu.co.comparadores;
 
 import uniquindio.edu.co.modelo.Paquete;

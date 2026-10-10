@@ -1,6 +1,6 @@
-
 package uniquindio.edu.co.servicio;
 
+import uniquindio.edu.co.comparadores.ComparadorPrioridad;
 import uniquindio.edu.co.modelo.Paquete;
 import uniquindio.edu.co.modelo.Repartidor;
 import uniquindio.edu.co.estructuras.ListaSimplementeEnlazada;
@@ -29,11 +29,12 @@ public class SistemaQuindioExpress {
     private PriorityQueue<Paquete> colaPrioridad;
 
     private ListaSimplementeEnlazada<Paquete> historialEntregas;
+    private Map<String, Paquete> paquetesAsignados;
 
     public SistemaQuindioExpress() {
 
         paquetesPendientes = new ArrayList<>();
-
+        paquetesAsignados = new HashMap<>();
         paquetesPorCodigo = new HashMap<>();
         repartidoresPorIdentificacion = new HashMap<>();
 
@@ -43,10 +44,12 @@ public class SistemaQuindioExpress {
         colaLlegada = new ArrayDeque<>();
 
         // Se configurará cuando ComparadorPrioridad esté implementado.
-        colaPrioridad = null;
+        colaPrioridad = new PriorityQueue<>(new ComparadorPrioridad());
 
         historialEntregas = new ListaSimplementeEnlazada<>();
     }
+
+    //PAQUETES
 
     public boolean registrarPaquete(Paquete paquete) {
 
@@ -74,12 +77,149 @@ public class SistemaQuindioExpress {
         }
         paquetesPorMunicipio.get(municipio).add(paquete);
 
-        /*
-        //Insertando elementos en la cola
+
+        //Insertando paquetes en la cola por orden de llegada y por prioridad
         colaLlegada.offer(paquete);
         colaPrioridad.offer(paquete);
 
-         */
+
         return true;
     }
+
+
+    public Paquete consultarPaquete(String codigo) {
+        return paquetesPorCodigo.get(codigo);
+    }
+
+    public int cantidadPaquetesPendientes() {
+        return paquetesPendientes.size();
+    }
+
+    public Set<String> obtenerMunicipios() {
+        return new HashSet<>(municipiosDestino);
+    }
+
+    public List<Paquete> obtenerPaquetesPorMunicipio(String municipio) {
+
+        if (!paquetesPorMunicipio.containsKey(municipio)) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(paquetesPorMunicipio.get(municipio));
+    }
+
+    public Paquete consultarSiguientePorLlegada() {
+        return colaLlegada.peek();
+    }
+
+    public Paquete consultarSiguientePorPrioridad() {
+        return colaPrioridad.peek();
+    }
+
+    public boolean hayPaquetesPendientes() {
+        return !paquetesPendientes.isEmpty();
+    }
+
+
+    // REPARTIDORES
+
+    public boolean registrarRepartidor(Repartidor repartidor) {
+        if (repartidor == null) {
+            return false;
+        }
+
+        if(repartidoresPorIdentificacion.containsKey(repartidor.getIdentificacion())){
+            return false;
+        }
+        repartidoresPorIdentificacion.put(repartidor.getIdentificacion(), repartidor);
+        return true;
+    }
+
+    public Repartidor consultarRepartidor(String identificacion) {
+        return repartidoresPorIdentificacion.get(identificacion);
+    }
+
+    public boolean puedeAtender(Repartidor repartidor, Paquete paquete){
+        if(repartidor == null || paquete == null){
+            return false;
+        }
+
+        if(repartidor.isDisponible() && repartidor.getZona().equalsIgnoreCase(paquete.getDestino())){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public boolean despacharPorLlegada(String identificacionRepartidor) {
+
+        Repartidor repartidor = repartidoresPorIdentificacion.get(identificacionRepartidor);
+
+        Paquete paquete = colaLlegada.peek();
+        if(paquete==null){
+            return false;
+        }
+
+        if (!puedeAtender(repartidor, paquete)) {
+            return false;
+        }
+
+        // Evitar asignar otro paquete a un repartidor ocupado.
+        if (paquetesAsignados.containsKey(identificacionRepartidor)) {
+            return false;
+        }
+
+        paquetesAsignados.put(identificacionRepartidor, paquete);
+        repartidor.setDisponible(false);
+        colaLlegada.poll();
+        colaPrioridad.remove(paquete);
+        paquetesPendientes.remove(paquete);
+
+        //Eliminando paquete del municipio
+        String municipio = paquete.getDestino();
+        List<Paquete> paquetesDelMunicipio = paquetesPorMunicipio.get(municipio);
+        paquetesDelMunicipio.remove(paquete);
+
+        return true;
+    }
+
+
+    public boolean despacharPorPrioridad(String identificacionRepartidor) {
+
+        Repartidor repartidor = repartidoresPorIdentificacion.get(identificacionRepartidor);
+
+        Paquete paquete = colaPrioridad.peek();
+
+        if(paquete==null){
+            return false;
+        }
+        if (!puedeAtender(repartidor, paquete)) {
+            return false;
+        }
+
+        // Evitar asignar otro paquete a un repartidor ocupado.
+        if (paquetesAsignados.containsKey(identificacionRepartidor)) {
+            return false;
+        }
+
+        paquetesAsignados.put(identificacionRepartidor, paquete);
+        repartidor.setDisponible(false);
+
+        colaPrioridad.poll();
+        colaLlegada.remove(paquete);
+        paquetesPendientes.remove(paquete);
+
+        // Eliminando paquete del municipio.
+        String municipio = paquete.getDestino();
+        List<Paquete> paquetesDelMunicipio = paquetesPorMunicipio.get(municipio);
+        paquetesDelMunicipio.remove(paquete);
+
+        return true;
+    }
+
+    public Paquete consultarPaqueteAsignado(String identificacionRepartidor) {
+        return paquetesAsignados.get(identificacionRepartidor);
+    }
+
 }
